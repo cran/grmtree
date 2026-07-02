@@ -518,8 +518,8 @@ default is 1, indicating that a unidimensional model will be fitted</p>
 <span id="cb9-47"><a href="#cb9-47" tabindex="-1"></a></span>
 <span id="cb9-48"><a href="#cb9-48" tabindex="-1"></a><span class="do">## Compute the M2 model fit statistic</span></span>
 <span id="cb9-49"><a href="#cb9-49" tabindex="-1"></a><span class="fu">M2</span>(mos_grm, <span class="at">type =</span> <span class="st">&quot;C2&quot;</span>)</span>
-<span id="cb9-50"><a href="#cb9-50" tabindex="-1"></a><span class="co">#&gt;             M2 df p     RMSEA   RMSEA_5  RMSEA_95     SRMSR      TLI       CFI</span></span>
-<span id="cb9-51"><a href="#cb9-51" tabindex="-1"></a><span class="co">#&gt; stats 1568.994 20 0 0.1487777 0.1425678 0.1550398 0.0391844 0.961774 0.9726957</span></span>
+<span id="cb9-50"><a href="#cb9-50" tabindex="-1"></a><span class="co">#&gt;             M2 df p RMSEA RMSEA_5 RMSEA_95 SRMSR   TLI   CFI</span></span>
+<span id="cb9-51"><a href="#cb9-51" tabindex="-1"></a><span class="co">#&gt; stats 1568.994 20 0 0.149   0.143    0.155 0.039 0.962 0.973</span></span>
 <span id="cb9-52"><a href="#cb9-52" tabindex="-1"></a></span>
 <span id="cb9-53"><a href="#cb9-53" tabindex="-1"></a><span class="do">## Infit and outfit statistics</span></span>
 <span id="cb9-54"><a href="#cb9-54" tabindex="-1"></a>mirt<span class="sc">::</span><span class="fu">itemfit</span>(mos_grm, <span class="fu">c</span>(<span class="st">&#39;S_X2&#39;</span>, <span class="st">&#39;infit&#39;</span>), <span class="at">method =</span> <span class="st">&#39;EAP&#39;</span>)</span>

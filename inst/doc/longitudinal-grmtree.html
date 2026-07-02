@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Response Shift Detection with the Longitudinal GRMTree</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Response Shift Detection with the
+Longitudinal GRMTree</h1>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The Longitudinal GRMTree (<code>longitudinal_grmtree</code>) extends
+the cross-sectional tree-based graded response model to the longitudinal
+setting, providing a data-driven framework for detecting
+<strong>response shift (RS)</strong> in patient-reported outcome
+measures (PROMs) measured at two time points. Response shift refers to a
+change in the meaning of a respondent’s self-evaluation of a construct
+over time, arising from a change in internal standards (recalibration),
+values (reprioritization), or the definition of the construct
+(reconceptualization).</p>
+<p>The method operates in two phases:</p>
+<ul>
+<li><strong>Phase 1 (<code>longitudinal_grmtree</code>):</strong> A
+constrained two-factor longitudinal GRM (item parameters held equal
+across time) is embedded within model-based recursive partitioning. The
+tree identifies patient subgroups whose longitudinal measurement model
+differs.</li>
+<li><strong>Phase 2 (<code>rs_characterize</code>):</strong> Within each
+terminal node, the equality constraints are relaxed and a likelihood
+ratio test compares the constrained (no-RS) model to an unconstrained
+(RS-allowed) model. Items exhibiting RS are identified and classified as
+recalibration, reprioritization, or both.</li>
+</ul>
+<p>This vignette demonstrates:</p>
+<ul>
+<li>Preparing wide-format longitudinal PROM data</li>
+<li>Fitting the Longitudinal GRMTree</li>
+<li>Characterizing response shift within subgroups</li>
+<li>Visualizing and extracting results</li>
+</ul>
+</div>
+<div id="install-and-load-required-packages" class="section level1">
+<h1>Install and load required packages</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="do">## Install packages from CRAN repository</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;grmtree&quot;</span>, <span class="st">&quot;mirt&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)        <span class="co"># For data manipulation</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(grmtree)      <span class="co"># For the Longitudinal GRMTree</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(mirt)         <span class="co"># For the underlying IRT estimation</span></span></code></pre></div>
+</div>
+<div id="import-and-explore-the-data" class="section level1">
+<h1>Import and explore the data</h1>
+<p>The package ships with a synthetic longitudinal dataset,
+<code>grmtree_long_data</code>, containing responses to the eight MOS-SS
+emotional domain items at baseline and one-year follow-up, together with
+baseline covariates. The data were simulated from a two-factor
+longitudinal GRM in which older patients (age &gt; 61) experience
+response shift on two items, so the example produces a real,
+interpretable result.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="do">## Load the data</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;grmtree_long_data&quot;</span>, <span class="at">package =</span> <span class="st">&quot;grmtree&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="do">## Take a glimpse at the data</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">glimpse</span>(grmtree_long_data)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; Rows: 1,500</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; Columns: 24</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; $ MOS_Listen              &lt;dbl&gt; 3, 5, 4, 5, 5, 5, 5, 4, 5, 4, 3, 5, 5, 4, 4, 5…</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; $ MOS_Info                &lt;dbl&gt; 2, 5, 4, 3, 5, 5, 4, 1, 5, 4, 4, 4, 5, 3, 5, 5…</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; $ MOS_Advice_Crisis       &lt;dbl&gt; 4, 5, 2, 3, 5, 5, 4, 3, 5, 4, 3, 4, 5, 4, 4, 5…</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; $ MOS_Confide             &lt;dbl&gt; 4, 5, 4, 5, 5, 5, 5, 2, 5, 3, 4, 4, 5, 2, 4, 5…</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; $ MOS_Advice_Want         &lt;dbl&gt; 4, 5, 4, 5, 4, 4, 4, 2, 5, 4, 2, 3, 5, 5, 4, 5…</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; $ MOS_Fears               &lt;dbl&gt; 5, 5, 5, 5, 5, 5, 4, 3, 5, 3, 2, 4, 5, 3, 4, 5…</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; $ MOS_Personal            &lt;dbl&gt; 5, 5, 4, 3, 5, 5, 3, 2, 5, 3, 3, 4, 5, 4, 4, 5…</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; $ MOS_Understand          &lt;dbl&gt; 3, 5, 3, 5, 5, 5, 4, 2, 5, 3, 4, 5, 5, 5, 5, 5…</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; $ MOS_Listen_year1        &lt;dbl&gt; 5, 3, 5, 4, 5, 5, 4, 2, 5, 3, 5, 4, 5, 3, 4, 5…</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; $ MOS_Info_year1          &lt;dbl&gt; 4, 3, 5, 4, 5, 4, 5, 5, 5, 3, 5, 4, 4, 3, 5, 5…</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; $ MOS_Advice_Crisis_year1 &lt;dbl&gt; 5, 2, 5, 5, 5, 5, 5, 3, 5, 3, 4, 4, 4, 4, 3, 5…</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; $ MOS_Confide_year1       &lt;dbl&gt; 5, 2, 4, 4, 5, 5, 4, 4, 5, 4, 4, 4, 5, 4, 5, 5…</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; $ MOS_Advice_Want_year1   &lt;dbl&gt; 5, 3, 4, 4, 5, 5, 4, 2, 5, 1, 4, 3, 2, 4, 4, 5…</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; $ MOS_Fears_year1         &lt;dbl&gt; 1, 1, 3, 5, 5, 5, 1, 5, 5, 5, 4, 4, 4, 5, 2, 5…</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; $ MOS_Personal_year1      &lt;dbl&gt; 5, 2, 2, 3, 5, 4, 4, 3, 5, 4, 4, 4, 4, 3, 5, 5…</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; $ MOS_Understand_year1    &lt;dbl&gt; 5, 1, 3, 3, 5, 5, 5, 2, 5, 3, 5, 4, 4, 3, 5, 5…</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; $ sex                     &lt;fct&gt; Male, Male, Male, Male, Male, Female, Male, Ma…</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; $ age                     &lt;dbl&gt; 73, 59, 58, 61, 59, 54, 74, 58, 57, 60, 57, 67…</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt; $ residency               &lt;fct&gt; Urban, Rural, Urban, Urban, Urban, Urban, Urba…</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; $ job                     &lt;fct&gt; Unemployed, Employed, Employed, Unemployed, Un…</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; $ education               &lt;fct&gt; Primary/High school, College/University, Colle…</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; $ ever_smoker             &lt;fct&gt; Yes, No, Yes, Yes, Yes, Yes, Yes, Yes, No, Yes…</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; $ comorbidity_count       &lt;int&gt; 1, 1, 3, 3, 2, 2, 5, 0, 1, 1, 1, 0, 1, 0, 1, 3…</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt; $ bmi                     &lt;dbl&gt; 29.9, 27.1, 33.3, 34.3, 34.2, 23.6, 14.6, 19.4…</span></span></code></pre></div>
+<p>The first eight columns are the baseline items, the next eight are
+the one-year follow-up items (suffixed <code>_year1</code>), followed by
+the covariates.</p>
+</div>
+<div id="prepare-the-longitudinal-data" class="section level1">
+<h1>Prepare the longitudinal data</h1>
+<p>The <code>prepare_longitudinal_data()</code> helper builds the
+wide-format response matrix required by
+<code>longitudinal_grmtree()</code>. You supply the baseline item names,
+the follow-up item names (in the same order), and any covariates to
+carry along.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="do">## Baseline item names</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>items_t1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;MOS_Listen&quot;</span>, <span class="st">&quot;MOS_Info&quot;</span>, <span class="st">&quot;MOS_Advice_Crisis&quot;</span>, <span class="st">&quot;MOS_Confide&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>              <span class="st">&quot;MOS_Advice_Want&quot;</span>, <span class="st">&quot;MOS_Fears&quot;</span>, <span class="st">&quot;MOS_Personal&quot;</span>, <span class="st">&quot;MOS_Understand&quot;</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="do">## Follow-up item names (same order, with the _year1 suffix)</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>items_t2 <span class="ot">&lt;-</span> <span class="fu">paste0</span>(items_t1, <span class="st">&quot;_year1&quot;</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="do">## Build the wide-format data</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>ld <span class="ot">&lt;-</span> <span class="fu">prepare_longitudinal_data</span>(</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="at">data       =</span> grmtree_long_data,</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="at">items_t1   =</span> items_t1,</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="at">items_t2   =</span> items_t2,</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="at">covariates =</span> <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;age&quot;</span>, <span class="st">&quot;residency&quot;</span>, <span class="st">&quot;job&quot;</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>                 <span class="st">&quot;education&quot;</span>, <span class="st">&quot;comorbidity_count&quot;</span>, <span class="st">&quot;ever_smoker&quot;</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="do">## The response matrix lives in the resp_wide column (16 = 2 x 8 columns)</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="fu">dim</span>(ld<span class="sc">$</span>resp_wide)</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; [1] 1500   16</span></span></code></pre></div>
+</div>
+<div id="phase-1-fit-the-longitudinal-grmtree" class="section level1">
+<h1>Phase 1: Fit the Longitudinal GRMTree</h1>
+<p>We fit the tree with the wide-format response matrix on the left-hand
+side and the candidate partitioning variables on the right. The
+<code>minbucket</code> control governs the minimum terminal node size;
+it should be large enough for stable estimation of the node-specific
+model (roughly 10–25 times the number of free parameters per node).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="do">## Fit the Longitudinal GRMTree</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>tree <span class="ot">&lt;-</span> <span class="fu">longitudinal_grmtree</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  resp_wide <span class="sc">~</span> sex <span class="sc">+</span> age <span class="sc">+</span> residency <span class="sc">+</span> job <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    education <span class="sc">+</span> comorbidity_count <span class="sc">+</span> ever_smoker,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">data    =</span> ld,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">n_items =</span> <span class="dv">8</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">grmtree.control</span>(<span class="at">minbucket =</span> <span class="dv">200</span>, <span class="at">p_adjust =</span> <span class="st">&quot;bonferroni&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="do">## Print the tree structure</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fu">print</span>(tree)</span></code></pre></div>
+<p>Fitting the full model is computationally intensive, so the chunk
+above is not evaluated when the vignette is built. The tree splits the
+sample on <strong>age at 61</strong>, producing two subgroups. Example
+output:</p>
+<pre><code>Graded Response Model Tree
+
+Model formula:
+resp_wide ~ sex + age + residency + job + education + comorbidity_count +
+    ever_smoker
+
+Fitted party:
+[1] root
+|   [2] age &lt;= 61: n = 597
+|       ... (constrained item parameters, means, covariance) ...
+|   [3] age &gt; 61: n = 903
+|       ... (constrained item parameters, means, covariance) ...
+
+Number of inner nodes:    1
+Number of terminal nodes: 2
+Number of parameters per node: 3
+Objective function (negative log-likelihood): 26051.77</code></pre>
+<p>The tree identifies a younger subgroup (age &lt;= 61, n = 597) and an
+older subgroup (age &gt; 61, n = 903) whose constrained longitudinal
+measurement models differ. Note that the split itself does
+<strong>not</strong> establish response shift; it identifies where the
+measurement model is heterogeneous. Response shift is tested in Phase
+2.</p>
+</div>
+<div id="phase-2-characterize-response-shift" class="section level1">
+<h1>Phase 2: Characterize response shift</h1>
+<p><code>rs_characterize()</code> performs the Phase 2 test within each
+terminal node. It reports an omnibus RS test (constrained vs
+unconstrained) per node, and, where the omnibus test is significant, an
+item-level test that classifies each flagged item. Two levels of
+multiple-comparison control are available: <code>global_p_adjust</code>
+across nodes (the “in which subgroups?” question) and
+<code>p_adjust</code> within nodes (the “which items?” question).</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="do">## Phase 2: characterize response shift</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>rs <span class="ot">&lt;-</span> <span class="fu">rs_characterize</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  tree,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">p_adjust        =</span> <span class="st">&quot;fdr&quot;</span>,          <span class="co"># item-level correction within nodes</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">global_p_adjust =</span> <span class="st">&quot;bonferroni&quot;</span>,   <span class="co"># omnibus correction across nodes</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">rs_threshold    =</span> <span class="fl">0.3</span>             <span class="co"># RS-type classification threshold</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="do">## View the results</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="fu">print</span>(rs)</span></code></pre></div>
+<p>Example output:</p>
+<pre><code>=== Response Shift Characterization ===
+
+--- Omnibus RS Test (Constrained vs Unconstrained) ---
+Node 2 (n = 597):
+  LRT: chi2 = 36.791, df = 40, p = 6.155e-01, p_adj = 1.000e+00
+  RS detected: FALSE
+Node 3 (n = 903):
+  LRT: chi2 = 449.498, df = 40, p = 1.067e-70, p_adj = 2.133e-70
+  RS detected: TRUE
+
+--- Item-Level RS Testing ---
+Node 3:
+  Item  2: chi2 =  50.670, df = 5, p_adj = 0.000000  Reprioritization  ***
+  Item  5: chi2 =  19.626, df = 5, p_adj = 0.003915  Significant (small effect) ***
+  Item  6: chi2 = 383.014, df = 5, p_adj = 0.000000  Recalibration     ***</code></pre>
+<p>The younger subgroup (Node 2) shows no response shift. The older
+subgroup (Node 3) shows significant response shift, localized to the
+<strong>Info</strong> item (reprioritization; a discrimination change)
+and the <strong>Fears</strong> item (recalibration; a threshold change).
+This is exactly the pattern built into the synthetic data, and it
+illustrates how the Longitudinal GRMTree pinpoints <em>which
+subgroup</em> and <em>which items</em> exhibit response shift without
+pre-specifying the subgroups.</p>
+<div id="accessing-the-results" class="section level2">
+<h2>Accessing the results</h2>
+<p>The returned object stores the omnibus and item-level results as data
+frames, and the raw constrained/unconstrained parameter matrices for
+each node.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>rs<span class="sc">$</span>global       <span class="co"># one row per terminal node (omnibus results)</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>rs<span class="sc">$</span>item_level   <span class="co"># one row per item per RS-detected node</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>rs<span class="sc">$</span>parameters   <span class="co"># constrained and unconstrained item parameters per node</span></span></code></pre></div>
+</div>
+</div>
+<div id="visualizing-response-shift" class="section level1">
+<h1>Visualizing response shift</h1>
+<p>Two visualization helpers summarize the Phase 2 results.
+<code>plot_rs_tree()</code> annotates each terminal node of the tree
+with its omnibus result and an item-level RS colour bar;
+<code>plot_rs_heatmap()</code> gives a standalone item-by-node
+heatmap.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="do">## Short item labels for display</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>mos_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Listen&quot;</span>, <span class="st">&quot;Info&quot;</span>, <span class="st">&quot;Crisis&quot;</span>, <span class="st">&quot;Confide&quot;</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                <span class="st">&quot;Advice&quot;</span>, <span class="st">&quot;Fears&quot;</span>, <span class="st">&quot;Personal&quot;</span>, <span class="st">&quot;Understand&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="do">## Annotated tree with RS results in the terminal nodes</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">plot_rs_tree</span>(tree, rs, <span class="at">item_labels =</span> mos_labels)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="do">## Standalone item-level RS heatmap</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="fu">plot_rs_heatmap</span>(rs, <span class="at">item_labels =</span> mos_labels)</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="do">## Heatmap with chi-squared values shown in the cells</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="fu">plot_rs_heatmap</span>(rs, <span class="at">item_labels =</span> mos_labels, <span class="at">show_chi2 =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>The threshold region plot of the tree itself is also available.
+Because the constrained model enforces equal parameters across time, the
+plot shows only the eight unique items rather than all sixteen
+columns.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="do">## Region plot of the tree with item names</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">plot</span>(tree, <span class="at">names =</span> mos_labels, <span class="at">tnex =</span> <span class="dv">2</span><span class="dt">L</span>)</span></code></pre></div>
+</div>
+<div id="extracting-parameters-and-scores" class="section level1">
+<h1>Extracting parameters and scores</h1>
+<p>A family of extraction functions returns node-specific quantities.
+Each returns <code>n_items</code> rows per node (the unique T1 items),
+not <code>2 * n_items</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="do">## Threshold parameters (8 items per node)</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">threshpar_longitudinal_grmtree</span>(tree)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="do">## Discrimination parameters (from the a1 column)</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="fu">discrpar_longitudinal_grmtree</span>(tree)</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="do">## Combined item parameters (discrimination + thresholds)</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="fu">itempar_longitudinal_grmtree</span>(tree)</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="do">## Latent trait summary per node (mu_T2, variance, T1-T2 correlation)</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="fu">latentpar_longitudinal_grmtree</span>(tree)</span></code></pre></div>
+<p>Factor scores are returned per node, with two columns
+(<code>Theta_T1</code> and <code>Theta_T2</code>) because the model
+estimates a latent trait at each time point.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="do">## Factor scores per terminal node</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">fscores_longitudinal_grmtree</span>(tree)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">head</span>(scores[[<span class="st">&quot;3&quot;</span>]])   <span class="co"># Theta_T1 and Theta_T2 for the older subgroup</span></span></code></pre></div>
+<p>Finally, <code>generate_node_scores_dataset()</code> merges node
+membership and factor scores back onto the original data frame, which is
+convenient for downstream analyses (for example, relating latent change
+to clinical outcomes).</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="do">## Augment the original data with node assignments and factor scores</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>scored <span class="ot">&lt;-</span> <span class="fu">generate_node_scores_dataset</span>(tree, <span class="at">data =</span> ld)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="fu">glimpse</span>(scored)   <span class="co"># all original columns + node + Theta_T1 + Theta_T2</span></span></code></pre></div>
+</div>
+<div id="interpreting-a-tree-with-no-split" class="section level1">
+<h1>Interpreting a tree with no split</h1>
+<p>If <code>longitudinal_grmtree()</code> returns a single terminal node
+(the root), no covariate moderates the measurement model. This does
+<strong>not</strong> imply the absence of response shift:
+<code>rs_characterize()</code> still runs on the single root node and
+can detect uniform response shift affecting the whole sample. In other
+words, the tree localizes <em>heterogeneity</em> in RS, while Phase 2
+tests for RS itself.</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>This vignette demonstrated the two-phase Longitudinal GRMTree
+workflow: preparing wide-format data, fitting the tree to identify
+subgroups (<code>longitudinal_grmtree</code>), characterizing response
+shift within those subgroups (<code>rs_characterize</code>), and
+visualizing and extracting the results. The method identifies both
+<em>which subgroups</em> and <em>which items</em> exhibit response shift
+in a single data-driven analysis, without requiring the subgroups to be
+specified in advance.</p>
+<p>For the cross-sectional tree-based graded response model, see the
+“Getting Started with the grmtree Package” vignette.</p>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+<ul>
+<li>Sprangers, M. A., &amp; Schwartz, C. E. (1999). Integrating response
+shift into health-related quality of life research. <em>Social Science
+&amp; Medicine</em>, 48(11), 1507–1515.</li>
+<li>Oort, F. J. (2005). Using structural equation modeling to detect
+response shifts and true change. <em>Quality of Life Research</em>,
+14(3), 587–598.</li>
+<li>Arimoro, O. I., Lix, L. M., Patten, S. B., Sawatzky, R., Sebille,
+V., Liu, J., Wiebe, S., Josephson, C. B., &amp; Sajobi, T. T. (2025).
+Tree-based latent variable model for assessing differential item
+functioning in patient-reported outcome measures: a simulation study.
+<em>Quality of Life Research</em>. <a href="https://doi.org/10.1007/s11136-025-04018-6" class="uri">https://doi.org/10.1007/s11136-025-04018-6</a> ```</li>
+</ul>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
