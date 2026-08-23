@@ -400,45 +400,47 @@ package.</p>
 <span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>                   Education, job, smoker,</span>
 <span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>                   multimorbidity)), as.factor) </span>
 <span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a></span>
-<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="do">## Explore the data</span></span>
-<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="fu">head</span>(resp.data)</span>
-<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 17</span></span>
-<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt;   MOS_Listen MOS_Info MOS_Advice_Crisis MOS_Confide MOS_Advice_Want MOS_Fears</span></span>
-<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt;   &lt;ord&gt;      &lt;ord&gt;    &lt;ord&gt;             &lt;ord&gt;       &lt;ord&gt;           &lt;ord&gt;    </span></span>
-<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; 1 5          5        5                 5           5               5        </span></span>
-<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; 2 4          3        3                 4           2               2        </span></span>
-<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt; 3 5          5        5                 4           4               5        </span></span>
-<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; 4 3          3        3                 2           3               4        </span></span>
-<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; 5 5          5        5                 4           4               5        </span></span>
-<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; 6 2          3        5                 4           3               4        </span></span>
-<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; # ℹ 11 more variables: MOS_Personal &lt;ord&gt;, MOS_Understand &lt;ord&gt;, sex &lt;fct&gt;,</span></span>
-<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; #   age &lt;dbl&gt;, residency &lt;fct&gt;, depressed &lt;fct&gt;, bmi &lt;dbl&gt;, Education &lt;fct&gt;,</span></span>
-<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt; #   job &lt;fct&gt;, smoker &lt;fct&gt;, multimorbidity &lt;fct&gt;</span></span>
-<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a></span>
-<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="do">## Check the structure of the data</span></span>
-<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="fu">glimpse</span>(resp.data)</span>
-<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a><span class="co">#&gt; Rows: 3,500</span></span>
-<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a><span class="co">#&gt; Columns: 17</span></span>
-<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a><span class="co">#&gt; $ MOS_Listen        &lt;ord&gt; 5, 4, 5, 3, 5, 2, 5, 5, 2, 3, 3, 4, 5, 2, 5, 3, 5, 4…</span></span>
-<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a><span class="co">#&gt; $ MOS_Info          &lt;ord&gt; 5, 3, 5, 3, 5, 3, 5, 5, 2, 4, 3, 4, 5, 2, 4, 4, 4, 3…</span></span>
-<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a><span class="co">#&gt; $ MOS_Advice_Crisis &lt;ord&gt; 5, 3, 5, 3, 5, 5, 5, 5, 4, 4, 3, 4, 2, 2, 4, 4, 4, 3…</span></span>
-<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a><span class="co">#&gt; $ MOS_Confide       &lt;ord&gt; 5, 4, 4, 2, 4, 4, 5, 5, 2, 3, 3, 4, 5, 2, 5, 4, 5, 3…</span></span>
-<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a><span class="co">#&gt; $ MOS_Advice_Want   &lt;ord&gt; 5, 2, 4, 3, 4, 3, 5, 5, 4, 3, 3, 4, 2, 2, 5, 4, 4, 2…</span></span>
-<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a><span class="co">#&gt; $ MOS_Fears         &lt;ord&gt; 5, 2, 5, 4, 5, 4, 5, 5, 1, 2, 1, 4, 5, 2, 5, 4, 4, 4…</span></span>
-<span id="cb3-58"><a href="#cb3-58" tabindex="-1"></a><span class="co">#&gt; $ MOS_Personal      &lt;ord&gt; 5, 2, 5, 1, 5, 2, 5, 5, 4, 2, 3, 4, 5, 2, 5, 4, 4, 3…</span></span>
-<span id="cb3-59"><a href="#cb3-59" tabindex="-1"></a><span class="co">#&gt; $ MOS_Understand    &lt;ord&gt; 5, 2, 5, 1, 4, 3, 5, 5, 4, 2, 3, 4, 5, 2, 5, 4, 4, 3…</span></span>
-<span id="cb3-60"><a href="#cb3-60" tabindex="-1"></a><span class="co">#&gt; $ sex               &lt;fct&gt; Male, Male, Male, Male, Male, Female, Male, Female, …</span></span>
-<span id="cb3-61"><a href="#cb3-61" tabindex="-1"></a><span class="co">#&gt; $ age               &lt;dbl&gt; 69, 66, 72, 52, 61, 57, 61, 71, 77, 65, 55, 64, 45, …</span></span>
-<span id="cb3-62"><a href="#cb3-62" tabindex="-1"></a><span class="co">#&gt; $ residency         &lt;fct&gt; urban, urban, urban, urban, urban, rural, urban, urb…</span></span>
-<span id="cb3-63"><a href="#cb3-63" tabindex="-1"></a><span class="co">#&gt; $ depressed         &lt;fct&gt; No, No, No, Yes, No, No, Yes, No, No, No, Yes, No, N…</span></span>
-<span id="cb3-64"><a href="#cb3-64" tabindex="-1"></a><span class="co">#&gt; $ bmi               &lt;dbl&gt; 22.85714, 33.59375, 24.38272, 31.14187, 25.88057, 24…</span></span>
-<span id="cb3-65"><a href="#cb3-65" tabindex="-1"></a><span class="co">#&gt; $ Education         &lt;fct&gt; Primary/High school, College/University, College/Uni…</span></span>
-<span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a><span class="co">#&gt; $ job               &lt;fct&gt; Unemployed, Unemployed, Unemployed, Unemployed, Unem…</span></span>
-<span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a><span class="co">#&gt; $ smoker            &lt;fct&gt; No, No, Yes, No, No, No, Yes, Yes, No, No, No, Yes, …</span></span>
-<span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a><span class="co">#&gt; $ multimorbidity    &lt;fct&gt; 2+, 2+, 1, 1, 2+, 2+, 2+, 1, 2+, 2+, 2+, 2+, 1, 2+, …</span></span>
-<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a></span>
-<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a><span class="do">## Create response as outcomes</span></span>
-<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a>resp.data<span class="sc">$</span>resp <span class="ot">&lt;-</span> <span class="fu">data.matrix</span>(resp.data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>])</span></code></pre></div>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="do">## Note: Partitioning variables must be factor/numeric (character columns are coerced automatically, but converting yourself is cleaner).</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="do">## Explore the data</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="fu">head</span>(resp.data)</span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 17</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt;   MOS_Listen MOS_Info MOS_Advice_Crisis MOS_Confide MOS_Advice_Want MOS_Fears</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt;   &lt;ord&gt;      &lt;ord&gt;    &lt;ord&gt;             &lt;ord&gt;       &lt;ord&gt;           &lt;ord&gt;    </span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt; 1 5          5        5                 5           5               5        </span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; 2 4          3        3                 4           2               2        </span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; 3 5          5        5                 4           4               5        </span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; 4 3          3        3                 2           3               4        </span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; 5 5          5        5                 4           4               5        </span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; 6 2          3        5                 4           3               4        </span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt; # ℹ 11 more variables: MOS_Personal &lt;ord&gt;, MOS_Understand &lt;ord&gt;, sex &lt;fct&gt;,</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt; #   age &lt;dbl&gt;, residency &lt;fct&gt;, depressed &lt;fct&gt;, bmi &lt;dbl&gt;, Education &lt;fct&gt;,</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt; #   job &lt;fct&gt;, smoker &lt;fct&gt;, multimorbidity &lt;fct&gt;</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a><span class="do">## Check the structure of the data</span></span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a><span class="fu">glimpse</span>(resp.data)</span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a><span class="co">#&gt; Rows: 3,500</span></span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a><span class="co">#&gt; Columns: 17</span></span>
+<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a><span class="co">#&gt; $ MOS_Listen        &lt;ord&gt; 5, 4, 5, 3, 5, 2, 5, 5, 2, 3, 3, 4, 5, 2, 5, 3, 5, 4…</span></span>
+<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a><span class="co">#&gt; $ MOS_Info          &lt;ord&gt; 5, 3, 5, 3, 5, 3, 5, 5, 2, 4, 3, 4, 5, 2, 4, 4, 4, 3…</span></span>
+<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a><span class="co">#&gt; $ MOS_Advice_Crisis &lt;ord&gt; 5, 3, 5, 3, 5, 5, 5, 5, 4, 4, 3, 4, 2, 2, 4, 4, 4, 3…</span></span>
+<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a><span class="co">#&gt; $ MOS_Confide       &lt;ord&gt; 5, 4, 4, 2, 4, 4, 5, 5, 2, 3, 3, 4, 5, 2, 5, 4, 5, 3…</span></span>
+<span id="cb3-58"><a href="#cb3-58" tabindex="-1"></a><span class="co">#&gt; $ MOS_Advice_Want   &lt;ord&gt; 5, 2, 4, 3, 4, 3, 5, 5, 4, 3, 3, 4, 2, 2, 5, 4, 4, 2…</span></span>
+<span id="cb3-59"><a href="#cb3-59" tabindex="-1"></a><span class="co">#&gt; $ MOS_Fears         &lt;ord&gt; 5, 2, 5, 4, 5, 4, 5, 5, 1, 2, 1, 4, 5, 2, 5, 4, 4, 4…</span></span>
+<span id="cb3-60"><a href="#cb3-60" tabindex="-1"></a><span class="co">#&gt; $ MOS_Personal      &lt;ord&gt; 5, 2, 5, 1, 5, 2, 5, 5, 4, 2, 3, 4, 5, 2, 5, 4, 4, 3…</span></span>
+<span id="cb3-61"><a href="#cb3-61" tabindex="-1"></a><span class="co">#&gt; $ MOS_Understand    &lt;ord&gt; 5, 2, 5, 1, 4, 3, 5, 5, 4, 2, 3, 4, 5, 2, 5, 4, 4, 3…</span></span>
+<span id="cb3-62"><a href="#cb3-62" tabindex="-1"></a><span class="co">#&gt; $ sex               &lt;fct&gt; Male, Male, Male, Male, Male, Female, Male, Female, …</span></span>
+<span id="cb3-63"><a href="#cb3-63" tabindex="-1"></a><span class="co">#&gt; $ age               &lt;dbl&gt; 69, 66, 72, 52, 61, 57, 61, 71, 77, 65, 55, 64, 45, …</span></span>
+<span id="cb3-64"><a href="#cb3-64" tabindex="-1"></a><span class="co">#&gt; $ residency         &lt;fct&gt; urban, urban, urban, urban, urban, rural, urban, urb…</span></span>
+<span id="cb3-65"><a href="#cb3-65" tabindex="-1"></a><span class="co">#&gt; $ depressed         &lt;fct&gt; No, No, No, Yes, No, No, Yes, No, No, No, Yes, No, N…</span></span>
+<span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a><span class="co">#&gt; $ bmi               &lt;dbl&gt; 22.85714, 33.59375, 24.38272, 31.14187, 25.88057, 24…</span></span>
+<span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a><span class="co">#&gt; $ Education         &lt;fct&gt; Primary/High school, College/University, College/Uni…</span></span>
+<span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a><span class="co">#&gt; $ job               &lt;fct&gt; Unemployed, Unemployed, Unemployed, Unemployed, Unem…</span></span>
+<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a><span class="co">#&gt; $ smoker            &lt;fct&gt; No, No, Yes, No, No, No, Yes, Yes, No, No, No, Yes, …</span></span>
+<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a><span class="co">#&gt; $ multimorbidity    &lt;fct&gt; 2+, 2+, 1, 1, 2+, 2+, 2+, 1, 2+, 2+, 2+, 2+, 1, 2+, …</span></span>
+<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" tabindex="-1"></a><span class="do">## Create response as outcomes</span></span>
+<span id="cb3-73"><a href="#cb3-73" tabindex="-1"></a>resp.data<span class="sc">$</span>resp <span class="ot">&lt;-</span> <span class="fu">data.matrix</span>(resp.data[, <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>])</span></code></pre></div>
 </div>
 <div id="grm-forests-implementation" class="section level1">
 <h1>GRM Forests Implementation</h1>
@@ -453,15 +455,18 @@ package.</p>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">p_adjust =</span> <span class="st">&quot;BH&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a></span>
 <span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="do">## Define the forest control parameters</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>forest_control <span class="ot">&lt;-</span> <span class="fu">grmforest.control</span>(</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="at">n_tree =</span> <span class="dv">3</span>, <span class="co"># Number of trees (Reduced for vignette build time)</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="at">sampling =</span> <span class="st">&quot;bootstrap&quot;</span>,  <span class="co"># Bootstrap method; resampling also available</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="at">sample_fraction =</span> <span class="fl">0.632</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="fu">sqrt</span>(<span class="dv">9</span>),  <span class="co"># Usually the square root of the number of covariates</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="at">control =</span> grm_control,</span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>  <span class="at">remove_dead_trees =</span> <span class="cn">TRUE</span>, <span class="co"># Remove any null GRMTree</span></span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span></span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">9</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>forest_control <span class="ot">&lt;-</span> <span class="fu">grmforest.control</span>(</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="at">n_tree =</span> <span class="dv">3</span>, <span class="co"># Number of trees (Reduced for vignette build time)</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="at">sampling =</span> <span class="st">&quot;subsample&quot;</span>,  <span class="co"># subsample method; bootstrap also available</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="at">sample_fraction =</span> <span class="fl">0.632</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="fu">ceiling</span>(<span class="fu">sqrt</span>(p)),  <span class="co"># Usually the square root of the number of covariates</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="at">control =</span> grm_control,</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>  <span class="at">remove_dead_trees =</span> <span class="cn">TRUE</span>, <span class="co"># Remove any null GRMTree</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="at">n_cores =</span> <span class="dv">2</span>            <span class="co"># Parallel now works (PSOCK/Windows included)</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="grow-the-grm-forest" class="section level2">
 <h2>Grow the GRM Forest</h2>
@@ -474,11 +479,10 @@ package.</p>
 <span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>)</span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
 <span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="do">## Get the summary of the fitted forest</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">summary</span>(mos_forest)</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fu">print</span>(mos_forest)</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="do">## Plot a tree in the forest</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="fu">plot</span>(mos_forest<span class="sc">$</span>trees[[<span class="dv">1</span>]])</span></code></pre></div>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">print</span>(mos_forest)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="do">## Plot a tree in the forest</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="fu">plot</span>(mos_forest<span class="sc">$</span>trees[[<span class="dv">1</span>]])</span></code></pre></div>
 </div>
 </div>
 <div id="variable-importance" class="section level1">
@@ -491,10 +495,18 @@ package.</p>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="do">## Print the result of the variable importance</span></span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">print</span>(importance)</span></code></pre></div>
 <p>Example output:</p>
-<pre><code>           age         smoker            bmi multimorbidity            sex 
-     403.07554      220.37908       39.02621       37.00120       32.06389 
-     Education      residency      depressed            job 
-       0.00000        0.00000        0.00000        0.00000 </code></pre>
+<pre><code>GRM Forest variable importance (permutation)
+  Trees: 50  Mean OOB log-likelihood: -9378.57 
+  
+       age         smoker    job     multimorbidity     sex      residency    bmi 
+        12.391      6.646   1.904       1.855          1.594      0.687      0.137 
+     depressed      Education 
+         0.120         -0.262 
+
+attr(,&quot;n_tree&quot;)
+[1] 50
+attr(,&quot;baseline&quot;)
+[1] -9378.569</code></pre>
 </div>
 <div id="plot-the-variable-importance-of-each-variable" class="section level2">
 <h2>Plot the variable importance of each variable</h2>

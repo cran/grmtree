@@ -1,3 +1,45 @@
+# grmtree 0.2.2
+
+## Bug fixes
+
+* `grmforest()` now runs reliably in parallel (`n_cores > 1`) on all platforms,
+  including PSOCK/Windows workers, and results are identical regardless of the
+  number of cores. Out-of-bag membership is stored as row indices, and forests
+  can be grown in chunks and combined with `c()`.
+* `grmforest()` coerces character partitioning variables to factors, avoiding
+  tree failures on such covariates.
+* `varimp()` now scores out-of-bag respondents with the marginal (latent-
+  integrated) log-likelihood using the correct GRM parameterization, and
+  averages paired within-tree permutation differences.
+* `grmfit()` no longer computes standard errors during fitting, which removes a
+  `chol()` failure on hard resamples and speeds up tree/forest construction;
+  results are unchanged.
+* Adjust `longitudinal_grmtree()` to restrict the split test to ITEM parameters 
+  (measurement invariance) and not include the structural parameters.
+* Corrected item-level testing in `rs_characterize()`. Item-level tests now run
+  only in nodes with omnibus response shift detected after the across-node
+  adjustment (`RS_detected`), instead of the unadjusted p-value, so no item rows
+  are produced for nodes that are not significant family-wise. The shift type is
+  now read from the estimated item-parameter changes (occasion-general
+  discrimination and thresholds) rather than a magnitude cut-point: a
+  significant item is always classified as recalibration, reprioritization, or
+  both, the "Significant (small effect)" label is removed, and the effect-size
+  magnitude is reported separately in a new `RS_magnitude` column.
+* Corrected the response-shift visualizations `plot_rs_tree()` and
+  `plot_rs_heatmap()`. Both now display p-values in fixed notation (e.g.
+  "p < 0.001") rather than scientific notation, label the latent parameters as
+  "Mean shift (T2)" and "Cor(T1, T2)", spell out the response-shift types in
+  full, and restrict the RS-type legend to Recalibration, Reprioritization,
+  Both, and None (the effect-size annotation is no longer shown as a shift
+  type).
+
+## Improvements
+* `varimp()` scores out-of-bag respondents with the marginal (latent-integrated)
+  log-likelihood and averages paired within-tree permutation differences;
+  out-of-bag membership is stored as row indices and forests can be combined
+  with `c()`.
+  
+  
 # grmtree 0.2.0 (2026)
 
 ## New features

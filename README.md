@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/Predicare1/grmtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Predicare1/grmtree/actions/workflows/R-CMD-check.yaml) [![CRAN version](https://www.r-pkg.org/badges/version/grmtree)](https://cran.r-project.org/package=grmtree) [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/grmtree)](https://cran.r-project.org/package=grmtree) [![License: GPL-3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html) [![Code size](https://img.shields.io/github/languages/code-size/Predicare1/grmtree.svg)](https://github.com/Predicare1/grmtree)
+[![R-CMD-check](https://github.com/Predicare1/grmtree/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Predicare1/grmtree/actions/workflows/R-CMD-check.yaml) [![CRAN version](https://www.r-pkg.org/badges/version/grmtree)](https://cran.r-project.org/package=grmtree) [![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/grmtree)](https://cran.r-project.org/package=grmtree) [![License: GPL-3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://cran.r-project.org/web/licenses/GPL-3) [![Code size](https://img.shields.io/github/languages/code-size/Predicare1/grmtree.svg)](https://github.com/Predicare1/grmtree)
 
 <!-- badges: end -->
 
@@ -57,6 +57,7 @@ devtools::install_github("Predicare1/grmtree", build_vignettes = TRUE)
 ```{r}
 # Load the package
 library(grmtree)
+library(dplyr)
 
 # Load the data
 data("grmtree_data") # Sample dataset included with package
@@ -151,7 +152,9 @@ browseVignettes("grmtree")
 # Fit a forest with 100 trees
 forest <- grmforest(resp ~ sex + age + Education,
                        data = resp.data,
-                   ctrl = grmforest.control(control = grm_control, n_tree = 100))
+                   control = grmforest.control(control = grm_control, 
+                   n_tree = 50, 
+                   n_cores = 2))
 
 # Variable importance
 vim <- varimp(forest)

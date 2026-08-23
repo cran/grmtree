@@ -69,28 +69,28 @@ response_data$resp <- data.matrix(response_data[, 1:8])
 # ## Scree plot to visualize the number of factors
 # fa.parallel(response_data$resp, fa = "fa")
 
-## -----------------------------------------------------------------------------
-## Create GRM
-mos_grm <- mirt(data = response_data$resp, 
-                model = 1,
-                itemtype = "graded", SE = TRUE, method = "EM",
-                verbose = FALSE)
+## ----eval=FALSE---------------------------------------------------------------
+# ## Create GRM
+# mos_grm <- mirt(data = response_data$resp,
+#                 model = 1,
+#                 itemtype = "graded", SE = TRUE, method = "EM",
+#                 verbose = FALSE)
 
-## -----------------------------------------------------------------------------
-## Get the coefficients
-mos_coef <- coef(mos_grm, IRTpars = T, simplify = TRUE)
-mos_coef
-
-## Get the residuals
-residuals(mos_grm, type = "Q3")
-
-## Compute the M2 model fit statistic
-M2(mos_grm, type = "C2")
-
-## Infit and outfit statistics
-mirt::itemfit(mos_grm, c('S_X2', 'infit'), method = 'EAP')
-
-## Could also use method = 'ML'
+## ----eval=FALSE---------------------------------------------------------------
+# ## Get the coefficients
+# mos_coef <- coef(mos_grm, IRTpars = T, simplify = TRUE)
+# mos_coef
+# 
+# ## Get the residuals
+# residuals(mos_grm, type = "Q3")
+# 
+# ## Compute the M2 model fit statistic
+# M2(mos_grm, type = "C2")
+# 
+# ## Infit and outfit statistics
+# mirt::itemfit(mos_grm, c('S_X2', 'infit'), method = 'EAP')
+# 
+# ## Could also use method = 'ML'
 
 ## ----eval = FALSE-------------------------------------------------------------
 # ## Plot the category response curves
@@ -125,12 +125,12 @@ grm_control <- grmtree.control(
   minbucket = 350,
   p_adjust = "BH", alpha = 0.05)
 
-
-## Fit the GRMTree model
-mos_grmtree <- grmtree(resp ~ sex + age + bmi + Education + depressed +
-                       residency + job + multimorbidity + smoker,  
-                       data = resp.data,
-                       control = grm_control)
+## ----eval=FALSE---------------------------------------------------------------
+# ## Fit the GRMTree model
+# mos_grmtree <- grmtree(resp ~ sex + age + bmi + Education + depressed +
+#                        residency + job + multimorbidity + smoker,
+#                        data = resp.data,
+#                        control = grm_control)
 
 ## ----eval=FALSE---------------------------------------------------------------
 # ## Bonferroni correction
@@ -145,46 +145,46 @@ mos_grmtree <- grmtree(resp ~ sex + age + bmi + Education + depressed +
 # tree_holm <- grmtree(response ~ covariate1 + covariate2, data = df,
 #                     control = grmtree.control(p_adjust = "holm"))
 
-## -----------------------------------------------------------------------------
-## Print the tree model
-print(mos_grmtree)
-print(mos_grmtree, FUN = function(x) " *")
+## ----eval=FALSE---------------------------------------------------------------
+# ## Print the tree model
+# print(mos_grmtree)
+# print(mos_grmtree, FUN = function(x) " *")
 
-## -----------------------------------------------------------------------------
-## Create the regions plot (by default)
-plot(mos_grmtree)
+## ----eval=FALSE---------------------------------------------------------------
+# ## Create the regions plot (by default)
+# plot(mos_grmtree)
+# 
+# ## This also creates a regions plot
+# plot(mos_grmtree, type = "regions",  tnex = 2L)
+# 
+# ## Create the histogram plot of the factor scores
+# plot(mos_grmtree, type = "histogram",  tnex = 2L)
+# 
+# ## Create the profile plot with different options
+# plot(mos_grmtree, type = "profile", tnex = 2L, what = "threshold")
+# plot(mos_grmtree, type = "profile", tnex = 2L, what = "discrimination")
+# plot(mos_grmtree, type = "profile", tnex = 2L, what = "item")
 
-## This also creates a regions plot
-plot(mos_grmtree, type = "regions",  tnex = 2L)
+## ----eval=FALSE---------------------------------------------------------------
+# ## Return the names of the covariates to know the position of age
+# names(mos_grmtree$data)
+# 
+# ## Rename the age to Age (Uncomment the code below and change to the correct name)
+# #names(mos_grmtree$data)[3] <- "Age"
+# 
+# ## Create the regions plot (by default)
+# plot(mos_grmtree)
 
-## Create the histogram plot of the factor scores
-plot(mos_grmtree, type = "histogram",  tnex = 2L)
-
-## Create the profile plot with different options
-plot(mos_grmtree, type = "profile", tnex = 2L, what = "threshold")
-plot(mos_grmtree, type = "profile", tnex = 2L, what = "discrimination")
-plot(mos_grmtree, type = "profile", tnex = 2L, what = "item")
-
-## -----------------------------------------------------------------------------
-## Return the names of the covariates to know the position of age
-names(mos_grmtree$data)
-
-## Rename the age to Age (Uncomment the code below and change to the correct name)
-#names(mos_grmtree$data)[3] <- "Age"
-
-## Create the regions plot (by default)
-plot(mos_grmtree)
-
-## -----------------------------------------------------------------------------
-## Extract and print the threshold parameters
-thresholds <- threshpar_grmtree(mos_grmtree)
-print(thresholds)
-
-## Extract and print the discrimination parameters
-discriminations <- discrpar_grmtree(mos_grmtree)
-print(discriminations)
-
-## Extract and print the item parameters
-itemspars <- itempar_grmtree(mos_grmtree)
-print(itemspars)
+## ----eval=FALSE---------------------------------------------------------------
+# ## Extract and print the threshold parameters
+# thresholds <- threshpar_grmtree(mos_grmtree)
+# print(thresholds)
+# 
+# ## Extract and print the discrimination parameters
+# discriminations <- discrpar_grmtree(mos_grmtree)
+# print(discriminations)
+# 
+# ## Extract and print the item parameters
+# itemspars <- itempar_grmtree(mos_grmtree)
+# print(itemspars)
 

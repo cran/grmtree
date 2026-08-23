@@ -29,6 +29,8 @@ resp.data <- grmtree_data %>%
                    Education, job, smoker,
                    multimorbidity)), as.factor) 
 
+## Note: Partitioning variables must be factor/numeric (character columns are coerced automatically, but converting yourself is cleaner).
+
 ## Explore the data
 head(resp.data)
 
@@ -48,14 +50,17 @@ grm_control <- grmtree.control(
   p_adjust = "BH", alpha = 0.05)
 
 ## Define the forest control parameters
+p <- 9
+
 forest_control <- grmforest.control(
   n_tree = 3, # Number of trees (Reduced for vignette build time)
-  sampling = "bootstrap",  # Bootstrap method; resampling also available
+  sampling = "subsample",  # subsample method; bootstrap also available
   sample_fraction = 0.632,
-  mtry = sqrt(9),  # Usually the square root of the number of covariates
+  mtry = ceiling(sqrt(p)),  # Usually the square root of the number of covariates
   control = grm_control,
   remove_dead_trees = TRUE, # Remove any null GRMTree
-  seed = 123
+  seed = 123,
+  n_cores = 2            # Parallel now works (PSOCK/Windows included)
 )
 
 ## ----eval=FALSE---------------------------------------------------------------
@@ -68,7 +73,6 @@ forest_control <- grmforest.control(
 # )
 # 
 # ## Get the summary of the fitted forest
-# summary(mos_forest)
 # print(mos_forest)
 # 
 # ## Plot a tree in the forest
