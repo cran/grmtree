@@ -113,3 +113,40 @@ dim(ld$resp_wide)
 # scored <- generate_node_scores_dataset(tree, data = ld)
 # glimpse(scored)   # all original columns + node + Theta_T1 + Theta_T2
 
+## ----eval=FALSE, warning=FALSE------------------------------------------------
+# ## GRMTree control parameters with Benjamini-Hochberg
+# grm_control <- grmtree.control(
+#   minbucket = 200,
+#   p_adjust = "BH", alpha = 0.05)
+# 
+# ## Define the forest control parameters
+# p <- 7
+# 
+# forest_control <- grmforest.control(
+#   n_tree = 3, # Number of trees (Reduced for vignette build time)
+#   sampling = "subsample",  # subsample method; bootstrap also available
+#   sample_fraction = 0.632,
+#   mtry = ceiling(sqrt(p)),  # Usually the square root of the number of covariates
+#   control = grm_control,
+#   remove_dead_trees = TRUE, # Remove any null GRMTree
+#   seed = 123,
+#   n_cores = 4            # Parallel now works (PSOCK/Windows included)
+# )
+# 
+# ## Grow a longitudinal GRM forest (same engine, longitudinal tree)
+# mos_forest <- grmforest(
+#   resp_wide ~ sex + age + residency + job +
+#     education + comorbidity_count + ever_smoker,
+#   data    = ld,
+#   control = forest_control,
+#   tree_fun  = longitudinal_grmtree,
+#   tree_args = list(n_items = 8)
+# )
+# print(mos_forest)
+
+## ----eval=FALSE---------------------------------------------------------------
+# ## Permutation variable importance
+# importance <- varimp(mos_forest, seed = 123, nperm = 5)
+# print(importance)
+# plot(importance)
+

@@ -344,8 +344,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>GRM Forests extend GRM Trees by creating ensembles of trees to
-provide more robust variable importance measures. This vignette
-covers:</p>
+provide more robust variable importance measures. The same forest works
+for longitudinal trees: see the <em>Response Shift Detection with the
+Longitudinal GRMTree</em> vignette for a longitudinal GRM Forest. This
+vignette covers:</p>
 <ul>
 <li><p>GRM Forest implementation</p></li>
 <li><p>Variable importance and variable importance plot.</p></li>
@@ -465,7 +467,7 @@ package.</p>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>  <span class="at">control =</span> grm_control,</span>
 <span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>  <span class="at">remove_dead_trees =</span> <span class="cn">TRUE</span>, <span class="co"># Remove any null GRMTree</span></span>
 <span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span>,</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="at">n_cores =</span> <span class="dv">2</span>            <span class="co"># Parallel now works (PSOCK/Windows included)</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="at">n_cores =</span> <span class="dv">4</span>            <span class="co"># Parallel now works (PSOCK/Windows included)</span></span>
 <span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="grow-the-grm-forest" class="section level2">

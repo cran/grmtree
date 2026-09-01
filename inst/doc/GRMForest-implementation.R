@@ -60,7 +60,7 @@ forest_control <- grmforest.control(
   control = grm_control,
   remove_dead_trees = TRUE, # Remove any null GRMTree
   seed = 123,
-  n_cores = 2            # Parallel now works (PSOCK/Windows included)
+  n_cores = 4            # Parallel now works (PSOCK/Windows included)
 )
 
 ## ----eval=FALSE---------------------------------------------------------------

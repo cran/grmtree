@@ -352,7 +352,11 @@ measures (PROMs) measured at two time points. Response shift refers to a
 change in the meaning of a respondent’s self-evaluation of a construct
 over time, arising from a change in internal standards (recalibration),
 values (reprioritization), or the definition of the construct
-(reconceptualization).</p>
+(reconceptualization). This vignette shows how to detect and
+characterize response shift with the <strong>Longitudinal
+GRMTree</strong>, and how to screen many candidate covariates at once
+with a <strong>Longitudinal GRM Forest</strong> built from the same
+model.</p>
 <p>The method operates in two phases:</p>
 <ul>
 <li><strong>Phase 1 (<code>longitudinal_grmtree</code>):</strong> A
@@ -372,6 +376,8 @@ recalibration, reprioritization, or both.</li>
 <li>Fitting the Longitudinal GRMTree</li>
 <li>Characterizing response shift within subgroups</li>
 <li>Visualizing and extracting results</li>
+<li>Growing a Longitudinal GRM Forest and rank covariates by permutation
+importance</li>
 </ul>
 </div>
 <div id="install-and-load-required-packages" class="section level1">
@@ -617,18 +623,83 @@ can detect uniform response shift affecting the whole sample. In other
 words, the tree localizes <em>heterogeneity</em> in RS, while Phase 2
 tests for RS itself.</p>
 </div>
+<div id="screening-many-covariates-the-longitudinal-grm-forest" class="section level1">
+<h1>Screening many covariates: the Longitudinal GRM Forest</h1>
+<p>A single tree can miss a moderator when many covariates compete for
+the same splits, and its structure can be sensitive to the resample. A
+<strong>Longitudinal GRM Forest</strong> grows many longitudinal trees
+on bootstrap/subsample replicates and ranks covariates by how much each
+one degrades the out-of-bag fit when permuted. It is the same machinery
+as the cross-sectional GRM Forest (see the <em>GRM Forests</em> vignette
+for the shared options such as <code>n_tree</code>,
+<code>sampling</code>, <code>mtry</code>, and <code>n_cores</code>), the
+only change is <code>tree_fun = longitudinal_grmtree</code>, with the
+items-per-occasion count passed through <code>tree_args</code>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="do">## GRMTree control parameters with Benjamini-Hochberg </span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>grm_control <span class="ot">&lt;-</span> <span class="fu">grmtree.control</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  <span class="at">minbucket =</span> <span class="dv">200</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  <span class="at">p_adjust =</span> <span class="st">&quot;BH&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="do">## Define the forest control parameters</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>forest_control <span class="ot">&lt;-</span> <span class="fu">grmforest.control</span>(</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>  <span class="at">n_tree =</span> <span class="dv">3</span>, <span class="co"># Number of trees (Reduced for vignette build time)</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>  <span class="at">sampling =</span> <span class="st">&quot;subsample&quot;</span>,  <span class="co"># subsample method; bootstrap also available</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>  <span class="at">sample_fraction =</span> <span class="fl">0.632</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>  <span class="at">mtry =</span> <span class="fu">ceiling</span>(<span class="fu">sqrt</span>(p)),  <span class="co"># Usually the square root of the number of covariates</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>  <span class="at">control =</span> grm_control,</span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>  <span class="at">remove_dead_trees =</span> <span class="cn">TRUE</span>, <span class="co"># Remove any null GRMTree</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">123</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>  <span class="at">n_cores =</span> <span class="dv">4</span>            <span class="co"># Parallel now works (PSOCK/Windows included)</span></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a>)</span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="do">## Grow a longitudinal GRM forest (same engine, longitudinal tree)</span></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a>mos_forest <span class="ot">&lt;-</span> <span class="fu">grmforest</span>(</span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>  resp_wide <span class="sc">~</span> sex <span class="sc">+</span> age <span class="sc">+</span> residency <span class="sc">+</span> job <span class="sc">+</span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>    education <span class="sc">+</span> comorbidity_count <span class="sc">+</span> ever_smoker,</span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a>  <span class="at">data    =</span> ld,</span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a>  <span class="at">control =</span> forest_control,</span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a>  <span class="at">tree_fun  =</span> longitudinal_grmtree,</span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a>  <span class="at">tree_args =</span> <span class="fu">list</span>(<span class="at">n_items =</span> <span class="dv">8</span>)</span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a>)</span>
+<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a><span class="fu">print</span>(mos_forest)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="do">## Permutation variable importance</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>importance <span class="ot">&lt;-</span> <span class="fu">varimp</span>(mos_forest, <span class="at">seed =</span> <span class="dv">123</span>, <span class="at">nperm =</span> <span class="dv">5</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="fu">print</span>(importance)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="fu">plot</span>(importance)</span></code></pre></div>
+<p><em>Example output (illustrative):</em></p>
+<pre><code>GRM Forest variable importance (permutation)
+  Trees: 100  Mean OOB log-likelihood: -13284.16
+             age              sex        education        residency 
+          41.207           12.884            6.341            3.502 
+             job  comorbidity_count      ever_smoker 
+           1.918            0.774            0.106 </code></pre>
+<p>The importance score here is the two-occasion (2-D) marginal
+log-likelihood, so a covariate ranks highly when the <em>longitudinal
+measurement model</em>, the item parameters constrained across baseline
+and follow-up, differs across its levels. This screens for covariates
+that moderate response shift, complementing the single tree, which
+localizes <em>which items</em> shift within the subgroups it finds.</p>
+<p>Because each tree fits a constrained two-factor model at every node,
+a longitudinal forest is heavier than a cross-sectional one. The same
+speed advice applies: start with a modest <code>n_tree</code> while
+exploring, and use <code>n_cores &gt; 1</code> (the result is identical
+regardless of core count).</p>
+</div>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>
 <p>This vignette demonstrated the two-phase Longitudinal GRMTree
 workflow: preparing wide-format data, fitting the tree to identify
 subgroups (<code>longitudinal_grmtree</code>), characterizing response
-shift within those subgroups (<code>rs_characterize</code>), and
-visualizing and extracting the results. The method identifies both
-<em>which subgroups</em> and <em>which items</em> exhibit response shift
-in a single data-driven analysis, without requiring the subgroups to be
-specified in advance.</p>
+shift within those subgroups (<code>rs_characterize</code>), visualizing
+and extracting the results, and fitting an ensemble of
+<code>longitudinal_grmtree</code> for variable importance. The method
+identifies both <em>which subgroups</em> and <em>which items</em>
+exhibit response shift in a single data-driven analysis, without
+requiring the subgroups to be specified in advance.</p>
 <p>For the cross-sectional tree-based graded response model, see the
-“Getting Started with the grmtree Package” vignette.</p>
+<strong>Getting Started with the grmtree Package</strong> vignette.</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
