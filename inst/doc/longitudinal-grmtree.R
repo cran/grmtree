@@ -61,7 +61,7 @@ dim(ld$resp_wide)
 #   tree,
 #   p_adjust        = "fdr",          # item-level correction within nodes
 #   global_p_adjust = "bonferroni",   # omnibus correction across nodes
-#   rs_threshold    = 0.3             # RS-type classification threshold
+#   purify          = TRUE            # iterative purification of item tests
 # )
 # 
 # ## View the results

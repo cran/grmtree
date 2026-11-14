@@ -496,8 +496,8 @@ Fitted party:
 
 Number of inner nodes:    1
 Number of terminal nodes: 2
-Number of parameters per node: 3
-Objective function (negative log-likelihood): 26051.77</code></pre>
+Number of parameters per node: 43
+Objective function (negative log-likelihood): 26048.72</code></pre>
 <p>The tree identifies a younger subgroup (age &lt;= 61, n = 597) and an
 older subgroup (age &gt; 61, n = 903) whose constrained longitudinal
 measurement models differ. Note that the split itself does
@@ -519,26 +519,34 @@ across nodes (the “in which subgroups?” question) and
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  tree,</span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">p_adjust        =</span> <span class="st">&quot;fdr&quot;</span>,          <span class="co"># item-level correction within nodes</span></span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">global_p_adjust =</span> <span class="st">&quot;bonferroni&quot;</span>,   <span class="co"># omnibus correction across nodes</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">rs_threshold    =</span> <span class="fl">0.3</span>             <span class="co"># RS-type classification threshold</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">purify          =</span> <span class="cn">TRUE</span>            <span class="co"># iterative purification of item tests</span></span>
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>)</span>
 <span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a></span>
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="do">## View the results</span></span>
 <span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="fu">print</span>(rs)</span></code></pre></div>
-<p>Example output:</p>
+<p>Example output (abridged):</p>
 <pre><code>=== Response Shift Characterization ===
 
 --- Omnibus RS Test (Constrained vs Unconstrained) ---
 Node 2 (n = 597):
-  LRT: chi2 = 36.791, df = 40, p = 6.155e-01, p_adj = 1.000e+00
+  LRT: chi2 = 37.182, df = 38, p = 5.071e-01, p_adj = 1.000e+00
   RS detected: FALSE
 Node 3 (n = 903):
-  LRT: chi2 = 449.498, df = 40, p = 1.067e-70, p_adj = 2.133e-70
+  LRT: chi2 = 444.013, df = 38, p = 1.118e-70, p_adj = 2.237e-70
   RS detected: TRUE
 
 --- Item-Level RS Testing ---
+(Items tested against purified anchors: flagged items freed iteratively)
+RS type: Wald tests of slope (reprioritization) and location
+(recalibration), each with the other parameters free
 Node 3:
-  Item  2: chi2 =  50.670, df = 5, p_adj = 0.000000  Reprioritization   [large] ***
-  Item  6: chi2 = 383.014, df = 5, p_adj = 0.000000  Recalibration     ***</code></pre>
+  Item  2: chi2 =  42.673, df = 5, p_adj = 0.000000  Reprioritization  (slope p = 0.000, location p = 0.074) ***
+  Item  5: chi2 =   8.015, df = 5, p_adj = 0.414427  None
+  Item  6: chi2 = 367.814, df = 5, p_adj = 0.000000  Recalibration     (slope p = 0.829, location p = 0.000) ***</code></pre>
+<p>The omnibus test has 38 degrees of freedom: freeing the 40 follow-up
+item parameters costs two fewer, because the follow-up latent mean and
+variance, estimated in the constrained model, are not identified once
+all items are free.</p>
 <p>The younger subgroup (Node 2) shows no response shift. The older
 subgroup (Node 3) shows significant response shift, localized to the
 <strong>Info</strong> item (reprioritization; a discrimination change)
@@ -547,6 +555,42 @@ This is exactly the pattern built into the synthetic data, and it
 illustrates how the Longitudinal GRMTree pinpoints <em>which
 subgroup</em> and <em>which items</em> exhibit response shift without
 pre-specifying the subgroups.</p>
+<div id="how-the-type-of-response-shift-is-decided" class="section level3">
+<h3>How the type of response shift is decided</h3>
+<p>An item is first <em>flagged</em> by the joint test above. Its
+<em>type</em> is then decided by two further tests in a model where the
+flagged items are free over time and the other items serve as
+anchors:</p>
+<ul>
+<li>a <strong>slope test</strong> (does the discrimination change?),
+which indicates <strong>reprioritization</strong>;</li>
+<li>a <strong>location test</strong> (do the thresholds change?), which
+indicates <strong>recalibration</strong>.</li>
+</ul>
+<p>Each test leaves the other set of parameters free, so a change in
+discrimination cannot masquerade as a change in thresholds, or the
+reverse. Both significant gives <strong>Both</strong>. If an item is
+flagged but neither part is significant on its own, it is labelled
+<strong>Undetermined</strong>: the shift is real, but the data cannot
+say which kind it is. No cut-off on the size of the change is used. For
+this item, Info, the slope test is significant and the location test is
+not, so it is reprioritization; for Fears it is the other way round.
+<code>type_method = &quot;threshold&quot;</code> reproduces the magnitude rule of
+grmtree 0.3.0.</p>
+</div>
+<div id="why-purify" class="section level3">
+<h3>Why purify?</h3>
+<p>Without purification (<code>purify = FALSE</code>, the default), each
+item is tested against all other items as anchors, including items that
+themselves shifted. In this example the single-pass tests also flag Item
+5 (<code>MOS_Advice_Want</code>, chi2 = 20.958, adjusted p = 0.002),
+although no response shift was simulated for it. With
+<code>purify = TRUE</code>, the items flagged in one pass (here Items 2
+and 6) are freed in the next, every item is tested against the
+non-flagged items only, and Item 5 is no longer flagged. The passes stop
+when the set of flagged items no longer changes (<code>max_iter</code>
+caps them). Purification needs extra model fits, so it takes longer.</p>
+</div>
 <div id="accessing-the-results" class="section level2">
 <h2>Accessing the results</h2>
 <p>The returned object stores the omnibus and item-level results as data

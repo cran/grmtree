@@ -1,7 +1,7 @@
 Package: grmtree
 Title: Recursive Partitioning for Graded Response Models
-Version: 0.3.0
-Date: 2026-09-01
+Version: 0.3.1
+Date: 2026-11-07
 Authors@R: c(person(given = "Olayinka I.", family = "Arimoro", role = c("aut", "cre"), email = "olayinka.arimoro@ucalgary.ca", comment = c(ORCID = "0009-0009-9464-589X")),
              person(given = "Tolulope T.", family = "Sajobi", role = "aut", email = "ttsajobi@ucalgary.ca"),
              person(given = "Lisa M.", family = "Lix", role = "aut", email = "Lisa.Lix@umanitoba.ca"),
@@ -33,7 +33,7 @@ Repository: CRAN
 VignetteBuilder: knitr
 LazyData: true
 NeedsCompilation: no
-Packaged: 2026-09-01 15:30:30 UTC; Olayinka A
+Packaged: 2026-11-07 17:23:06 UTC; Olayinka A
 Author: Olayinka I. Arimoro [aut, cre] (ORCID:
     <https://orcid.org/0009-0009-9464-589X>),
   Tolulope T. Sajobi [aut],
@@ -41,4 +41,4 @@ Author: Olayinka I. Arimoro [aut, cre] (ORCID:
   Matthew T. James [ctb],
   Maria Santana [ctb],
   Emmanuel Ugochukwu [ctb]
-Date/Publication: 2026-09-01 18:20:02 UTC
+Date/Publication: 2026-11-14 03:30:02 UTC
